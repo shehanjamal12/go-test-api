@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
+	"sync"
 	"github.com/gorilla/mux"
 )
 
@@ -13,7 +13,8 @@ type Items struct {
 	ItemName     string `json:"itemName"` //json part so that in postman it comes as simple i not capital
 	ItemQuantity int    `json:"itemQuantity"`
 }
-
+var m =sync.RWMutex{}
+var wg = sync.WaitGroup{}
 var itemList []Items = []Items{} //slice used to hold all the items which will be added dleted or updated
 
 func main() {
@@ -28,8 +29,15 @@ func main() {
 	route.HandleFunc("/delItembyName/{name}", delItembyName).Methods("DELETE")
 	route.HandleFunc("/updateItembyId/{id}", updateItembyID).Methods("PUT")
 	route.HandleFunc("/updateItembyName/{name}", updateItembyName).Methods("PUT")
-	http.ListenAndServe(":5000", route) //port used to run api
-
+	//wait group used to run api on 2 ports
+	wg.Add(2)
+	go func(){
+		http.ListenAndServe(":5400",route)
+	}()
+	go func(){
+		http.ListenAndServe(":5000", route
+	)}() //port used to run api
+	wg.Wait()
 }
 func delItembyName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json") //makes sure all content in the reponse is of json type
