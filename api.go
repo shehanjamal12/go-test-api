@@ -24,6 +24,8 @@ func main() {
 	route.HandleFunc("/viewbyName/{name}", viewbyName).Methods("GET")
 	route.HandleFunc("/delItem/{id}", delItem).Methods("DELETE")
 	route.HandleFunc("/delItembyName/{name}", delItembyName).Methods("DELETE")
+	route.HandleFunc("/updateItembyId/{id}", updateItembyID).Methods("PUT")
+	route.HandleFunc("/updateItembyName/{name}", updateItembyName).Methods("PUT")
 	http.ListenAndServe(":5000", route)
 
 }
@@ -111,4 +113,41 @@ func viewAllItem(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(itemList)
 
+}
+func updateItembyName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var name = mux.Vars(r)["name"]
+	var updateitem Items
+	var i int = 0
+	var length = len(itemList)
+	for _, item := range itemList {
+		if item.ItemName == name {
+			json.NewDecoder(r.Body).Decode(&updateitem)
+			itemList[i] = updateitem
+			break
+		}
+		i++
+		if i > length {
+			w.Write([]byte("Error: Could Not Find Item"))
+		}
+	}
+
+	json.NewEncoder(w).Encode(itemList)
+}
+
+func updateItembyID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var idparam = mux.Vars(r)["id"]
+	var updateitem Items
+	id, err := strconv.Atoi(idparam)
+
+	if err != nil {
+		w.Write([]byte("Error: Id Could not be converted"))
+	}
+	if id > len(itemList) {
+		w.Write([]byte("Error: Id Could Not Be found"))
+	}
+	json.NewDecoder(r.Body).Decode(&updateitem)
+	itemList[id] = updateitem
+	json.NewEncoder(w).Encode(itemList)
 }
