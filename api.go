@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
 	"github.com/gorilla/mux"
 )
 
@@ -20,6 +21,7 @@ func main() {
 	route.HandleFunc("/addItem", addItem).Methods("POST")
 	route.HandleFunc("/viewAllItem", viewAllItem).Methods("GET")
 	route.HandleFunc("/viewItem/{id}", viewItem).Methods("GET")
+	route.HandleFunc("/viewbyName/{name}", viewbyName).Methods("GET")
 	route.HandleFunc("/delItem/{id}", delItem).Methods("DELETE")
 	route.HandleFunc("/delItembyName/{name}", delItembyName).Methods("DELETE")
 	http.ListenAndServe(":5000", route)
@@ -36,13 +38,34 @@ func delItembyName(w http.ResponseWriter, r *http.Request) {
 			itemList = append(itemList[:i], itemList[i+1:]...)
 			break
 		}
-		if i == length {
+		i++
+		if i > length {
+			w.WriteHeader(404)
 			w.Write([]byte("Error: Could Not Find Item"))
 		}
-		i++
 	}
 	json.NewEncoder(w).Encode(itemList)
 }
+func viewbyName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var name = mux.Vars(r)["name"]
+	var specific Items
+	var i int = 0
+	var length = len(itemList)
+	for _, item := range itemList {
+		if item.ItemName == name {
+			specific = itemList[i]
+			break
+		}
+		i++
+		if i > length {
+			w.WriteHeader(404)
+			w.Write([]byte("Error: Could Not Find Item"))
+		}
+	}
+	json.NewEncoder(w).Encode(specific)
+}
+
 func delItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var idparam = mux.Vars(r)["id"]
