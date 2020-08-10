@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+
 	"github.com/gorilla/mux"
 )
 
@@ -13,7 +14,8 @@ type Items struct {
 	ItemName     string `json:"itemName"` //json part so that in postman it comes as simple i not capital
 	ItemQuantity int    `json:"itemQuantity"`
 }
-var m =sync.RWMutex{}
+
+var m = sync.RWMutex{}
 var wg = sync.WaitGroup{}
 var itemList []Items = []Items{} //slice used to hold all the items which will be added dleted or updated
 
@@ -21,6 +23,7 @@ func main() {
 	route := mux.NewRouter()
 
 	//routes used in postman tomake request or get responses
+	route.HandleFunc("/", Test).Methods("GET")
 	route.HandleFunc("/addItem", addItem).Methods("POST")
 	route.HandleFunc("/viewAllItem", viewAllItem).Methods("GET")
 	route.HandleFunc("/viewItem/{id}", viewItem).Methods("GET")
@@ -31,13 +34,19 @@ func main() {
 	route.HandleFunc("/updateItembyName/{name}", updateItembyName).Methods("PUT")
 	//wait group used to run api on 2 ports
 	wg.Add(2)
-	go func(){
-		http.ListenAndServe(":5400",route)
+	go func() {
+		http.ListenAndServe(":5400", route)
 	}()
-	go func(){
-		http.ListenAndServe(":5000", route
-	)}() //port used to run api
+	go func() {
+		http.ListenAndServe(":5000", route)
+	}() //port used to run api
 	wg.Wait()
+}
+//asd
+func Test(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Write([]byte("hello"))
+
 }
 func delItembyName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json") //makes sure all content in the reponse is of json type
@@ -96,6 +105,7 @@ func delItem(w http.ResponseWriter, r *http.Request) {
 }
 func addItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 	var item Items
 	//used to get the request body and sets it to the variable
 	json.NewDecoder(r.Body).Decode(&item) //pointer is used here so that it will diretcly address the variable
@@ -123,7 +133,7 @@ func viewItem(w http.ResponseWriter, r *http.Request) {
 
 func viewAllItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
+	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(itemList)
 
 }
