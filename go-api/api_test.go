@@ -16,6 +16,7 @@ func Router() *mux.Router {
 
 }
 
+// both test must come as fail
 func ViewAll(t *testing.T) {
 	fmt.Println("asdasd")
 	request, _ := http.NewRequest("GET", "/viewAllItem", nil)
