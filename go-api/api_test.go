@@ -3,34 +3,43 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
-	"fmt"
+
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
 func Router() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/", Test).Methods("GET")
+	router.HandleFunc("/viewAllItem", viewAllItem).Methods("GET")
+	router.HandleFunc("/addItem", addItem).Methods("POST")
+	router.HandleFunc("/", test).Methods("GET")
+
 	return router
 
 }
 
 // both test must come as fail
-func ViewAll(t *testing.T) {
-	fmt.Println("asdasd")
+func TestViewAllItem(t *testing.T) {
+
 	request, _ := http.NewRequest("GET", "/viewAllItem", nil)
 	response := httptest.NewRecorder()
 	Router().ServeHTTP(response, request)
-	
-	assert.Equal(t, 400, response.Code, "Expect to see items from array")
+	assert.Equal(t, 200, response.Code, "Ok response expected")
 }
+func TestTest(t *testing.T) {
 
-func add(t *testing.T) {
-	fmt.Println("asdasd")
-	request, _ := http.NewRequest("POST", "/addItem", nil)
+	request, _ := http.NewRequest("GET", "/", nil)
 	response := httptest.NewRecorder()
 	Router().ServeHTTP(response, request)
-	
-	assert.Equal(t, 400, response.Code, "Expect to see items from array")
+	assert.Equal(t, 200, response.Code, "Ok response expected")
 }
+// func TestAdd(t *testing.T) {
+// 	test2:=
+// 	request, _ := http.NewRequest("POST", "/addItem", test2)
+// 	response := httptest.NewRecorder()
+// 	request.Header.Set("Content-Type", "application/json")
+// 	Router().ServeHTTP(response, request)
+// 	assert.Equal(t, 200, response.Code, "Ok response expected")
+// }

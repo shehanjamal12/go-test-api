@@ -23,7 +23,7 @@ func main() {
 	route := mux.NewRouter()
 
 	//routes used in postman tomake request or get responses
-	route.HandleFunc("/", Test).Methods("GET")
+	route.HandleFunc("/", test).Methods("GET")
 	route.HandleFunc("/addItem", addItem).Methods("POST")
 	route.HandleFunc("/viewAllItem", viewAllItem).Methods("GET")
 	route.HandleFunc("/viewItem/{id}", viewItem).Methods("GET")
@@ -42,8 +42,8 @@ func main() {
 	}() //port used to run api
 	wg.Wait()
 }
-//asd
-func Test(w http.ResponseWriter, r *http.Request) {
+
+func test(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Write([]byte("hello"))
 
@@ -134,6 +134,7 @@ func viewItem(w http.ResponseWriter, r *http.Request) {
 func viewAllItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+	w.Write([]byte("items"))
 	json.NewEncoder(w).Encode(itemList)
 
 }
