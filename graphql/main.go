@@ -8,106 +8,49 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-type Tutorial struct {
-	ID       int
-	Title    string
-	Author   Author
-	Comments []Comment
+type mainstruc struct {
+	df dbfunc
 }
 
-type Author struct {
-	Name      string
-	Tutorials []int
-}
-
-type Comment struct {
-	Body string
-}
-
-func populate() []Tutorial {
-	author := &Author{Name: "Elliot Forbes", Tutorials: []int{1}}
-	tutorial := Tutorial{
-		ID:     1,
-		Title:  "Go GraphQL Tutorial",
-		Author: *author,
-		Comments: []Comment{
-			Comment{Body: "First Comment"},
-		},
-	}
-
-	var tutorials []Tutorial
-	tutorials = append(tutorials, tutorial)
-
-	return tutorials
-}
-
-func main() {
+func  main() {
 	fmt.Println("hello")
-	tutorials := populate()
-	var commentType = graphql.NewObject(
+	var struc mainstruc
+	itemlist := struc.df.getitem()
+	var itemType = graphql.NewObject(
 		graphql.ObjectConfig{
-			Name: "Comment",
+			Name: "Items",
 			Fields: graphql.Fields{
-				"body": &graphql.Field{
+				"ItemName": &graphql.Field{
 					Type: graphql.String,
 				},
-			},
-		},
-	)
-	var authorType = graphql.NewObject(
-		graphql.ObjectConfig{
-			Name: "Author",
-			Fields: graphql.Fields{
-				"Name": &graphql.Field{
-					Type: graphql.String,
-				},
-				"Tutorials": &graphql.Field{
+				"ItemQuantity": &graphql.Field{
 
-					Type: graphql.NewList(graphql.Int),
-				},
-			},
-		},
-	)
-	var tutorialType = graphql.NewObject(
-		graphql.ObjectConfig{
-			Name: "Tutorial",
-			Fields: graphql.Fields{
-				"id": &graphql.Field{
 					Type: graphql.Int,
 				},
-				"title": &graphql.Field{
-					Type: graphql.String,
-				},
-				"author": &graphql.Field{
-
-					Type: authorType,
-				},
-				"comments": &graphql.Field{
-					Type: graphql.NewList(commentType),
-				},
 			},
 		},
 	)
+
 	fields := graphql.Fields{
 		"tutorial": &graphql.Field{
-			Type: tutorialType,
+			Type: itemType,
 
-			Description: "Get Tutorial By ID",
+			Description: "Get Item By Name",
 
 			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type: graphql.Int,
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.String,
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 
-				id, ok := p.Args["id"].(int)
+				name, ok := p.Args["name"].(string)
 				if ok {
 
-					for _, tutorial := range tutorials {
-						if int(tutorial.ID) == id {
+					for _, item := range itemlist {
+						if string(item.ItemName) == name {
 							// return our tutorial
-							return tutorial, nil
+							return item, nil
 						}
 					}
 				}
@@ -116,10 +59,10 @@ func main() {
 		},
 
 		"list": &graphql.Field{
-			Type:        graphql.NewList(tutorialType),
-			Description: "Get Tutorial List",
+			Type:        itemType,
+			Description: "Get all item",
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-				return tutorials, nil
+				return itemlist, nil
 			},
 		},
 	}
@@ -132,8 +75,7 @@ func main() {
 	query := `
 		{
 			list{
-				id
-				title
+				
 			}
 		}
 	`
@@ -144,4 +86,5 @@ func main() {
 	}
 	rJSON, _ := json.Marshal(r)
 	fmt.Printf("%s \n", rJSON)
+
 }
