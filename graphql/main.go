@@ -8,14 +8,10 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-type mainstruc struct {
-	df dbfunc
-}
-
-func  main() {
+func main() {
 	fmt.Println("hello")
-	var struc mainstruc
-	itemlist := struc.df.getitem()
+	var  itemlist []Items
+	itemlist = getitem()
 	var itemType = graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: "Items",
@@ -75,7 +71,8 @@ func  main() {
 	query := `
 		{
 			list{
-				
+				ItemName
+				ItemQuantity
 			}
 		}
 	`

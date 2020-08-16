@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	_"github.com/lib/pq"
 )
 
 const (
@@ -14,32 +15,9 @@ const (
 	password = "123"
 	dbname   = "item"
 )
-type dbfunc interface{
-	getitem() []Items
-}
-type dbstruct struct{
-	dbf dbfunc
-}
-func dbconnect() *sql.DB {
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
+func getitem() []Items {
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Succesfully Connected")
-	return db
-}
-
-func (h *dbstruct) getitem() []Items {
-	db := dbconnect()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -83,7 +61,6 @@ func (h *dbstruct) getitem() []Items {
 	return newItemList
 }
 func additem(Name string, Quantity int) {
-	db := dbconnect()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -104,7 +81,6 @@ func additem(Name string, Quantity int) {
 
 }
 func deleteitem(name string) {
-	db := dbconnect()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -119,7 +95,7 @@ func deleteitem(name string) {
 		panic(err)
 	}
 
-	log.Fatal(db.Prepare("DELETE FROM table_name WHERE itemName='$name'"))
+	log.Fatal(db.Prepare("DELETE FROM items WHERE itemName='$name'"))
 
 	fmt.Println("Successfully Deleted!")
 }
