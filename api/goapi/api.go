@@ -2,6 +2,7 @@ package goapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
@@ -15,24 +16,32 @@ type Items struct {
 	ItemName     string `json:"itemName"` //json part so that in postman it comes as simple i not capital
 	ItemQuantity int    `json:"itemQuantity"`
 }
-type test interface {
-	delItem(w http.ResponseWriter, r *http.Request)
-	addItem(w http.ResponseWriter, r *http.Request)
-	viewAllItem(w http.ResponseWriter, r *http.Request)
+type Test interface {
+	DelItem(w http.ResponseWriter, r *http.Request)
+	AddItem(w http.ResponseWriter, r *http.Request)
+	ViewAllItem(w http.ResponseWriter, r *http.Request)
 }
 type structapi struct {
-	tapi test
+	tapi Test
 }
-type strucdb struct {
-	repo dbinter
+type Strucdb struct {
+	repo Dbinter
 }
 
-func newstructapi(tapi test) structapi {
-	che := structapi{
+func Newdbstrc(repo Dbinter) Strucdb {
+	return Strucdb{
+		repo,
+	}
+
+}
+func Newstructapi(tapi Test) structapi {
+	return structapi{
 		tapi,
 	}
-	return che
+
 }
+
+var t1 Dbinter
 
 var m = sync.RWMutex{}
 var wg = sync.WaitGroup{}
@@ -44,7 +53,7 @@ func test12(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func viewbyName(w http.ResponseWriter, r *http.Request) {
+func ViewbyName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var name = mux.Vars(r)["name"]
 	var specific Items
@@ -63,7 +72,7 @@ func viewbyName(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(specific)
 }
-func delItembyName(w http.ResponseWriter, r *http.Request) {
+func DelItembyName(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json") //makes sure all content in the reponse is of json type
 	var name = mux.Vars(r)["name"]
@@ -85,8 +94,8 @@ func delItembyName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(itemList)
 
 }
-func delItem(w http.ResponseWriter, r *http.Request) {
-
+func (t *structapi) DelItem(w http.ResponseWriter, r *http.Request) {
+	t2 := Newdbstrc(t1)
 	w.Header().Set("Content-Type", "application/json")
 	var idparam = mux.Vars(r)["id"]  //get the id from postman request url
 	id, err := strconv.Atoi(idparam) //vonversion from string to integer
@@ -99,22 +108,24 @@ func delItem(w http.ResponseWriter, r *http.Request) {
 	}
 	//deleting and shifting the slice so that it will be ordered again correctly
 	iname := itemList[id].ItemName
-	deleteitem(iname)
+	t2.repo.Deleteitem(iname)
 	itemList = append(itemList[:id], itemList[id+1:]...)
 	json.NewEncoder(w).Encode(itemList)
 
 }
-func (h strucdb) addItem(w http.ResponseWriter, r *http.Request) {
+func (t *structapi) AddItem(w http.ResponseWriter, r *http.Request) {
+	t2 := Newdbstrc(t1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	var item Items
 	//used to get the request body and sets it to the variable
 	json.NewDecoder(r.Body).Decode(&item) //pointer is used here so that it will diretcly address the variable
+	t2.repo.Add(item)
 	itemList = append(itemList, item)
-	h.repo.additem(item)
 	json.NewEncoder(w).Encode(itemList)
+
 }
-func viewItem(w http.ResponseWriter, r *http.Request) {
+func ViewItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var idparam = mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idparam)
@@ -131,15 +142,16 @@ func viewItem(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func viewAllItem(w http.ResponseWriter, r *http.Request) {
+func (t *structapi) ViewAllItem(w http.ResponseWriter, r *http.Request) {
+	t2 := Newdbstrc(t1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write([]byte("items"))
-	getitem()
+	itemList = t2.repo.Getitem()
 	json.NewEncoder(w).Encode(itemList)
 
 }
-func updateItembyName(w http.ResponseWriter, r *http.Request) {
+func UpdateItembyName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var name = mux.Vars(r)["name"]
 	var updateitem Items
@@ -160,7 +172,7 @@ func updateItembyName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(itemList)
 }
 
-func updateItembyID(w http.ResponseWriter, r *http.Request) {
+func UpdateItembyID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var idparam = mux.Vars(r)["id"]
 	var updateitem Items

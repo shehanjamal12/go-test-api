@@ -6,23 +6,23 @@ import (
 	"strconv"
 )
 
-type dbinter interface {
+type Dbinter interface {
 	//getitem()
 	add(items Items)
 	//deleteitem(w http.ResponseWriter, r *http.Request)
 }
-type dbstruc struct {
-	dbint dbinter
+type Dbstruc struct {
+	dbint Dbinter
 }
 
-func newdbstrc(dbint dbinter) dbstruc {
-	return dbstruc{
+func Newdbstrc(dbint Dbinter) Dbstruc {
+	return Dbstruc{
 		dbint,
 	}
 	
 }
 
-func (h *dbstruc) add(items Items)  {
+func (h *Dbstruc) add(items Items)  {
 	
 	//item variable comes through parameter as empty and gives a runtime error
 	_, err := conn.Exec("INSERT INTO items (itemName,itemQuantity) VALUES ($1,$2)", items.ItemName, strconv.Itoa(items.ItemQuantity))

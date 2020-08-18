@@ -13,15 +13,15 @@ type Items struct {
 	ItemName     string `json:"itemName"` //json part so that in postman it comes as simple i not capital
 	ItemQuantity int    `json:"itemQuantity"`
 }
-type test interface {
+type Test interface {
 	//delItem(w http.ResponseWriter, r *http.Request)
 	addItem(w http.ResponseWriter, r *http.Request)
 	//viewAllItem(w http.ResponseWriter, r *http.Request)
 }
-type structapi struct {
+type Structapi struct {
 	tapi test
 }
-type strucdb struct {
+type Strucdb struct {
 	repo dbinter
 }
 

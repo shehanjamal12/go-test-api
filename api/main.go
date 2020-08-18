@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"api/goapi"
+	goapi"api/goapi"
 )
 
-func dbconnect() *sql.DB {
+func Dbconnect() *sql.DB {
 
 	host := "localhost"
 	port := 5432
@@ -33,26 +33,20 @@ func dbconnect() *sql.DB {
 	return db
 }
 
-var conn *sql.DB = dbconnect()
+var conn *sql.DB = Dbconnect()
 
 func main() {
-	//var apites test
-	var check strucdb
-	//var datbase dbinter
+	var apites goapi.Test
 	route := mux.NewRouter()
-	//api := newstructapi(apites)
-	//databas := newdbstrc(datbase)
+	api := goapi.Newstructapi(apites)
+	//datbase := Newdbstrc(databasinter)
 
 	// routes used in postman tomake request or get responses
-	route.HandleFunc("/", test12).Methods("GET")
-	route.HandleFunc("/addItem", check.addItem).Methods("POST")
-	route.HandleFunc("/viewAllItem", viewAllItem).Methods("GET")
-	route.HandleFunc("/viewItem/{id}", viewItem).Methods("GET")
-	route.HandleFunc("/viewbyName/{name}", viewbyName).Methods("GET")
-	route.HandleFunc("/delItem/{id}", delItem).Methods("DELETE")
-	route.HandleFunc("/delItembyName/{name}", delItembyName).Methods("DELETE")
-	route.HandleFunc("/updateItembyId/{id}", updateItembyID).Methods("PUT")
-	route.HandleFunc("/updateItembyName/{name}", updateItembyName).Methods("PUT")
+	//route.HandleFunc("/", test12).Methods("GET")
+	route.HandleFunc("/addItem", api.AddItem).Methods("POST")
+	route.HandleFunc("/viewAllItem", api.ViewAllItem).Methods("GET")
+	route.HandleFunc("/DelItem", api.DelItem).Methods("DELETE")
+
 	//wait group used to run api on 2 ports
 
 	http.ListenAndServe(":5000", route)
