@@ -2,7 +2,6 @@ package goapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"sync"
