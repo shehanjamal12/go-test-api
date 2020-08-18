@@ -1,4 +1,4 @@
-package main
+package goapi
 
 import (
 	"encoding/json"

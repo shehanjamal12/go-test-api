@@ -28,24 +28,22 @@ func dbconnect() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Succesfully Connected")
+	fmt.Println("Succesfully Connected on port 5432")
 	return db
 }
 
 var conn *sql.DB = dbconnect()
 
 func main() {
-	//var apites test
-	var check strucdb
-	//var datbase dbinter
+	var apites test
 	route := mux.NewRouter()
-	//api := newstructapi(apites)
-	//databas := newdbstrc(datbase)
+	api := newstructapi(apites)
 
 	// routes used in postman tomake request or get responses
-	route.HandleFunc("/addItem", check.addItem).Methods("POST")
+	route.HandleFunc("/addItem", api.addItem).Methods("POST")
 	//wait group used to run api on 2 ports
 
 	http.ListenAndServe(":5000", route)
+	fmt.Println("Listening on port 5000")
 
 }

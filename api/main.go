@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"api/goapi"
 )
 
 func dbconnect() *sql.DB {

@@ -8,21 +8,22 @@ import (
 
 type dbinter interface {
 	//getitem()
-	additem(items Items)
+	add(items Items)
 	//deleteitem(w http.ResponseWriter, r *http.Request)
 }
 type dbstruc struct {
 	dbint dbinter
 }
 
-func newdbstrc(dbint dbinter) *dbstruc {
-	che := &dbstruc{
+func newdbstrc(dbint dbinter) dbstruc {
+	return dbstruc{
 		dbint,
 	}
-	return che
+	
 }
 
-func (h *dbstruc) additem(items Items) {
+func (h *dbstruc) add(items Items)  {
+	
 	//item variable comes through parameter as empty and gives a runtime error
 	_, err := conn.Exec("INSERT INTO items (itemName,itemQuantity) VALUES ($1,$2)", items.ItemName, strconv.Itoa(items.ItemQuantity))
 	if err != nil {
